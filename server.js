@@ -8,9 +8,11 @@ function generateChunk(index, data, response, pieceNumber) {
     let end = (index + 1) * batchBuffer;
     console.log("index", index, "start", start, "end", end);
     let buffer = data.slice(start, end);
+    console.log("buffer", buffer.byteLength);
+    // test losing packet
     response.write(buffer);
     if (index == pieceNumber - 1) {
-      // end 
+      // end
       console.log("end", end);
       response.end();
     }
