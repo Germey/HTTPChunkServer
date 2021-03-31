@@ -1,4 +1,9 @@
-# http-transfer-encoding-chunked
-Node.js example demonstrate the http chunked transfer encoding
+# Http Chunk Server for Image
 
-![](./chunked.gif)
+Usage:
+
+```
+node server.js
+```
+
+Then Open index.html to preview.

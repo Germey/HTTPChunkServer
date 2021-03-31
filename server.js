@@ -1,34 +1,39 @@
 var http = require("http");
+var fs = require("fs");
+const batchBuffer = 10000;
 
-function generateChunk(index, response) {
+function generateChunk(index, data, response, pieceNumber) {
   setTimeout(() => {
-    if (index === 5) {
-      response.write("end");
-      response.end("</body></html>");
-    } else {
-      response.write(`<p> chunk ${index}</p>`);
+    let start = index * batchBuffer;
+    let end = (index + 1) * batchBuffer;
+    console.log("index", index, "start", start, "end", end);
+    let buffer = data.slice(start, end);
+    response.write(buffer);
+    if (index == pieceNumber - 1) {
+      // end 
+      console.log("end", end);
+      response.end();
     }
   }, index * 1000);
 }
 
 function handlerRequest(_request, response) {
-  response.setHeader("Content-Type", "text/html; charset=UTF-8");
+  response.setHeader("Content-Type", "image/jpeg");
   response.setHeader("Transfer-Encoding", "chunked");
-  response.write(`<!DOCTYPE html>
-  <html lang="en">
-  <head>
-  <meta charset="utf-8">
-  <title>HTTP Transer-Encoding:Chunked Node.js Example</title>
-  </head>
-  <body>
-  <h1>HTTP Transer-Encoding:Chunked Node.js Example</h1>
-  `);
-
-  let index = 0;
-  while (index <= 5) {
-    generateChunk(index, response);
-    index++;
-  }
+  var stream = fs.readFile("image.jpeg", (error, data) => {
+    if (!error) {
+      // response.setHeader("Content-Length", data.byteLength);
+      let length = data.byteLength;
+      console.log("length", length);
+      let pieceNumber = Math.ceil(length / batchBuffer);
+      console.log("pieceNumber", pieceNumber);
+      let index = 0;
+      while (index < pieceNumber) {
+        generateChunk(index, data, response, pieceNumber);
+        index++;
+      }
+    }
+  });
 }
 
 const server = http.createServer(handlerRequest);
