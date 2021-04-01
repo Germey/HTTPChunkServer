@@ -10,6 +10,9 @@ function generateChunk(index, data, response, pieceNumber) {
     let buffer = data.slice(start, end);
     console.log("buffer", buffer.byteLength);
     // test losing packet
+    // if (index != 4) {
+    //   response.write(buffer);
+    // }
     response.write(buffer);
     if (index == pieceNumber - 1) {
       // end
